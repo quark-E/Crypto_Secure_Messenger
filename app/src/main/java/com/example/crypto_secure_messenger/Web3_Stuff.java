@@ -19,13 +19,19 @@ import org.bouncycastle.jce.provider.*;
 
 public class Web3_Stuff {
 
-    //private final String password = "medium";
-    //private String walletPath = mContext.getFilesDir().getAbsolutePath();
-    //private File walletDir = new File(walletPath);
+    //Context mContext;
+
+    private final String password;
+    private String walletPath;
+    private File walletDir;
 
     Web3_Stuff(Context mContext)
     {
         setupBouncyCastle();
+        //this.mContext = mContext;
+        this.password = "medium";
+        this.walletPath = mContext.getFilesDir().getAbsolutePath();
+        this.walletDir = new File(walletPath);
         // FIXME: Add your own API key here
         Web3j web3 = Web3j.build(new HttpService("https://goerli.infura.io/v3/efff1f32623f43e4947d29cca3e4f6f6"));
         try {
@@ -45,9 +51,9 @@ public class Web3_Stuff {
             //Show Error
         }
         //FIXME: Use your own password here
-        final String password = "medium";
-        String walletPath = mContext.getFilesDir().getAbsolutePath();
-        File walletDir  = new File(walletPath);
+        //final String password = "medium";
+        //String walletPath = mContext.getFilesDir().getAbsolutePath();
+        //File walletDir  = new File(walletPath);
 
         try{
             WalletUtils.generateNewWalletFile(password, walletDir);
@@ -58,7 +64,7 @@ public class Web3_Stuff {
             //Display an Error
             Log.d("Error 2 ", e.toString());
         }
-
+        /*
         File[] list_of_Files = walletDir.listFiles();
         for(File file : list_of_Files) {
             if (file.isFile()) {
@@ -66,14 +72,36 @@ public class Web3_Stuff {
                     Credentials credentials = WalletUtils.loadCredentials(password, file.getAbsolutePath());
                     Toast.makeText(mContext, "Your address is " + credentials.getAddress(), Toast.LENGTH_LONG).show();
                     Log.d("Address ", credentials.getAddress());
-                    /*
+
                     TextView dynamicTextView = new TextView(mContext);
                     dynamicTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     dynamicTextView.setText(credentials.getAddress());
                     LinearLayout ll = new LinearLayout(mContext);
                     ll.addView(dynamicTextView);
-                    */
+
                     break;
+                } catch (Exception e) {
+                    //Show Error
+                    Log.d("Error 3 ", e.toString());
+                }
+            }
+        }
+        */
+    }
+
+    public void Views(Context mContext, TextView tv) {
+        File[] list_of_Files = walletDir.listFiles();
+        for(File file : list_of_Files) {
+            if (file.isFile()) {
+                try {
+                    Credentials credentials = WalletUtils.loadCredentials(password, file.getAbsolutePath());
+                    //TextView dynamicTextView = new TextView(mContext);
+                    //dynamicTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    //dynamicTextView.setText(credentials.getAddress());
+                    tv.setText(credentials.getAddress());
+                    Toast.makeText(mContext, "Your address is " + credentials.getAddress(), Toast.LENGTH_LONG).show();
+                    Log.d("Address ", credentials.getAddress());
+                    return;
                 } catch (Exception e) {
                     //Show Error
                     Log.d("Error 3 ", e.toString());
