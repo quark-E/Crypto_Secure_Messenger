@@ -1,5 +1,6 @@
 package com.example.crypto_secure_messenger;
-import android.content.ContextWrapper;
+//import android.content.ContextWrapper;
+import android.widget.LinearLayout;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
@@ -11,13 +12,15 @@ import android.widget.Toast;
 import android.content.Context;
 import java.security.Provider;
 import java.security.Security;
+import android.widget.TextView;
+import android.app.ActionBar.*;
 import org.bouncycastle.jce.provider.*;
 
 
 public class Web3_Stuff {
 
     //private final String password = "medium";
-    //private String walletPath = getFilesDir().getAbsolutePath();
+    //private String walletPath = mContext.getFilesDir().getAbsolutePath();
     //private File walletDir = new File(walletPath);
 
     Web3_Stuff(Context mContext)
@@ -63,6 +66,13 @@ public class Web3_Stuff {
                     Credentials credentials = WalletUtils.loadCredentials(password, file.getAbsolutePath());
                     Toast.makeText(mContext, "Your address is " + credentials.getAddress(), Toast.LENGTH_LONG).show();
                     Log.d("Address ", credentials.getAddress());
+                    /*
+                    TextView dynamicTextView = new TextView(mContext);
+                    dynamicTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    dynamicTextView.setText(credentials.getAddress());
+                    LinearLayout ll = new LinearLayout(mContext);
+                    ll.addView(dynamicTextView);
+                    */
                     break;
                 } catch (Exception e) {
                     //Show Error
