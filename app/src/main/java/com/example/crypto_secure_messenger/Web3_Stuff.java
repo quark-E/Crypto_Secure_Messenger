@@ -2,6 +2,9 @@ package com.example.crypto_secure_messenger;
 //import android.content.ContextWrapper;
 import android.widget.LinearLayout;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.EthSendRawTransaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import android.util.Log;
@@ -10,12 +13,21 @@ import org.web3j.crypto.*;
 //import android.app.Activity;
 import android.widget.Toast;
 import android.content.Context;
+
+import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutionException;
+import org.web3j.utils.Numeric;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
+
+import java.io.IOException;
+import java.math.BigInteger;
 import java.security.Provider;
 import java.security.Security;
 import android.widget.TextView;
 import android.app.ActionBar.*;
 import org.bouncycastle.jce.provider.*;
-
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.*;
 
 public class Web3_Stuff {
 
@@ -24,6 +36,8 @@ public class Web3_Stuff {
     private final String password;
     private String walletPath;
     private File walletDir;
+    private Credentials credentials;
+    private Web3j web3;
 
     Web3_Stuff(Context mContext)
     {
@@ -33,7 +47,7 @@ public class Web3_Stuff {
         this.walletPath = mContext.getFilesDir().getAbsolutePath();
         this.walletDir = new File(walletPath);
         // FIXME: Add your own API key here
-        Web3j web3 = Web3j.build(new HttpService("https://goerli.infura.io/v3/efff1f32623f43e4947d29cca3e4f6f6"));
+        this.web3 = Web3j.build(new HttpService("https://goerli.infura.io/v3/efff1f32623f43e4947d29cca3e4f6f6"));
         try {
             Web3ClientVersion clientVersion = web3.web3ClientVersion().sendAsync().get();
             if(!clientVersion.hasError()){
@@ -95,6 +109,7 @@ public class Web3_Stuff {
             if (file.isFile()) {
                 try {
                     Credentials credentials = WalletUtils.loadCredentials(password, file.getAbsolutePath());
+                    this.credentials = credentials;
                     //TextView dynamicTextView = new TextView(mContext);
                     //dynamicTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     //dynamicTextView.setText(credentials.getAddress());
@@ -108,6 +123,31 @@ public class Web3_Stuff {
                 }
             }
         }
+    }
+
+    public BigInteger getNonce() throws InterruptedException, ExecutionException {
+        EthGetTransactionCount ethGetBleh = web3.ethGetTransactionCount(
+                credentials.getAddress(), DefaultBlockParameterName.LATEST).sendAsync().get();
+
+        return ethGetBleh.getTransactionCount();
+    }
+
+    public void sendTrans(String address, String msg) throws InterruptedException, ExecutionException{
+        try {
+            //RawTransaction rt = RawTransaction.createTransaction(getNonce(), BigInteger.valueOf(50), BigInteger.valueOf(21000), "0x6a9A2Eb257a6E4B96134Bf03D58F161cE5DdA8F7", "Hi there!");
+            //"0x6a9A2Eb257a6E4B96134Bf03D58F161cE5DdA8F7"
+            RawTransaction rt2 = RawTransaction.createTransaction(getNonce(), BigInteger.valueOf(50), BigInteger.valueOf(210000), address, BigInteger.valueOf(100), toHex(msg));
+            byte[] signedMessage = TransactionEncoder.signMessage(rt2, credentials);
+            String hexValue = Numeric.toHexString(signedMessage);
+            EthSendTransaction ethSendTransaction = web3.ethSendRawTransaction(hexValue).sendAsync().get();
+            String transactionHash = ethSendTransaction.getTransactionHash();
+        } catch(Exception e) {
+                Log.d("SendErr", e.toString());
+            }
+    }
+
+    public String toHex(String arg) throws UnsupportedEncodingException {
+        return String.format("%x", new BigInteger(1, arg.getBytes("utf-8")));
     }
 
     private void setupBouncyCastle() {
