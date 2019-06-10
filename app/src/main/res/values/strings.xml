@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Crypto_Secure_Messenger</string>
+    <string name="action_setings">action_settings</string>
+    <string name="action_favorite">action_favorite</string>
 </resources>

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import android.content.Context;
 
 import java.io.UnsupportedEncodingException;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 import org.web3j.utils.Numeric;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
@@ -28,6 +29,7 @@ import android.app.ActionBar.*;
 import org.bouncycastle.jce.provider.*;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.*;
+import java.io.*;
 
 public class Web3_Stuff {
 
@@ -71,6 +73,9 @@ public class Web3_Stuff {
 
         try{
             WalletUtils.generateNewWalletFile(password, walletDir);
+            //ECKeyPair eck = Keys.createEcKeyPair();
+            //WalletFile wf = Wallet.createLight(password,eck);
+            //String fileName = getWalletFileName(wf);
             Log.d("Wallet! ", "Yal");
             Log.d("Wall path ", walletDir.toString());
         }
@@ -102,13 +107,19 @@ public class Web3_Stuff {
         }
         */
     }
-
+    /*
+    private static String getWalletFileName(WalletFile wf) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("'UTC--'yyyy-MM-dd'T'HH-mm-ss.nVV'--'");
+    }
+    */
     public void Views(Context mContext, TextView tv) {
         File[] list_of_Files = walletDir.listFiles();
         for(File file : list_of_Files) {
             if (file.isFile()) {
                 try {
                     Credentials credentials = WalletUtils.loadCredentials(password, file.getAbsolutePath());
+                    //ECKeyPair eck = ECKeyPair.create(new BigInteger("317965bd552acdaa0a9b6e243cf35769e5dcf899e2c7fe8bcdfac0411a3b2804"));
+                    //WalletFile wf = Wallet.
                     this.credentials = credentials;
                     //TextView dynamicTextView = new TextView(mContext);
                     //dynamicTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -116,6 +127,17 @@ public class Web3_Stuff {
                     tv.setText(credentials.getAddress());
                     Toast.makeText(mContext, "Your address is " + credentials.getAddress(), Toast.LENGTH_LONG).show();
                     Log.d("Address ", credentials.getAddress());
+                    Log.d("Credentials ", file.getAbsolutePath());
+                    try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
+                        String line = null;
+                        String err = "CredLines ";
+                        while((line = br.readLine()) != null) {
+                            Log.d(err, line);
+                            err = err + "+";
+                        }
+                    } catch(Exception e) {
+                        Log.d("ReadErr ", e.toString());
+                    }
                     return;
                 } catch (Exception e) {
                     //Show Error
